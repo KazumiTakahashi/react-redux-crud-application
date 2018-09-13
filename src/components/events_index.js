@@ -1,31 +1,49 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'; // connect関数はstoreやactionとの関連付け
+import _ from 'lodash';
+import { readEvents } from '../actions';
 
-import { increment, decrement } from '../actions';
+class EventsIndex extends Component {
+  componentDidMount(){
+    this.props.readEvents()
+  }
 
-class App extends Component {
+  readEvents(){
+    return _.map(this.props.events, event => (
+      <tr key={event.id}>
+        <td>{event.id}</td>
+        <td>{event.title}</td>
+        <td>{event.body}</td>
+      </tr>
+    ))
+  }
+
   //constructorはcomponentの初期化時に実行させるコールバック　状態の初期化をしていたが、その役割はreducerで行うので不要
   render() {
-    const props = this.props  // propsには状態やactionを渡すので変数に入れておく
-
     return (
       <React.Fragment>
-        <div>value: { props.value }</div>
-        <button onClick={ props.increment }>+1</button>
-        <button onClick={ props.decrement }>-1</button>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Body</th>
+            </tr>
+          </thead>
+          <tbody>
+            {this.readEvents()}
+          </tbody>
+        </table>
       </React.Fragment>
     )
   }
 }
 
-const mapStateToProps = state => ({ value: state.count.value })
-// const mapDispatchToProps = dispatch => ({
-//   increment: () => dispatch(increment()),
-//   decrement: () => dispatch(decrement())
-// })
-const mapDispatchToProps = ({ increment, decrement}) //こんな書き方もある
+const mapStateToProps = state => ({ events: state.events })
 
-export default connect(mapStateToProps,mapDispatchToProps)(App);
+const mapDispatchToProps = ({ readEvents }) 
+
+export default connect(mapStateToProps,mapDispatchToProps)(EventsIndex);
 
 // connect関数を使用してstateやactionとの関連付けを行って,viewのイベントで状態を遷移させて遷移後の状態を画面に再描画させる
 // mapStateToProps：stateの情報からこのcomponentで必要なものを取り出して、
